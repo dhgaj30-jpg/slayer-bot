@@ -174,7 +174,7 @@ async function scanAndAttack() {
             }
 
             // تأخير 500 ملي ثانية بين التعليق الأول والثاني لمنع الحظر
-            await new Promise(r => setTimeout(r, 500));
+            await new Promise(r => setTimeout(r, 200));
         }
 
     } catch (error) {
@@ -188,5 +188,5 @@ console.log('🚀 بدء تشغيل رادار الردود المستمر...');
 console.log('📡 يتم فحص أحدث تعليقين وردودهما كل 10 ثوانٍ...\n');
 
 scanAndAttack();
-setInterval(scanAndAttack, 10000);
+setInterval(scanAndAttack, 3000);
 
