@@ -139,7 +139,7 @@ async function scanAndAttack() {
         }
 
         // تحديد أحدث تعليقين فقط
-        const topComments = commentsList.slice(0, 2);
+        const topComments = commentsList.slice(0, 3);
 
         for (const comment of topComments) {
             const commentId = comment.anime_comment_id;
