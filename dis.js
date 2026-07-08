@@ -21,7 +21,7 @@ const TOKENS = [
     'b95ad4f0045438e07a86ddf76e3805eb5c245a7e'
 ];
 
-const TARGET_ANIME_ID = 2025;
+const TARGET_ANIME_ID = 2021;
 
 // قائمة الأسماء المتوقعة للمسار للاكتشاف التلقائي
 const ENDPOINTS_TO_TRY = [
