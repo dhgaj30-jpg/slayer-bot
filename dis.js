@@ -139,7 +139,7 @@ async function scanAndAttack() {
         }
 
         // تحديد أحدث تعليقين فقط
-        const topComments = commentsList.slice(0, 20);
+        const topComments = commentsList.slice(0, 10);
 
         for (const comment of topComments) {
             const commentId = comment.anime_comment_id;
@@ -174,7 +174,7 @@ async function scanAndAttack() {
             }
 
             // تأخير 500 ملي ثانية بين التعليق الأول والثاني لمنع الحظر
-            await new Promise(r => setTimeout(r, 100));
+            await new Promise(r => setTimeout(r, 25));
         }
 
     } catch (error) {
@@ -188,5 +188,5 @@ console.log('🚀 بدء تشغيل رادار الردود المستمر...');
 console.log('📡 يتم فحص أحدث تعليقين وردودهما كل 10 ثوانٍ...\n');
 
 scanAndAttack();
-setInterval(scanAndAttack, 1000);
+setInterval(scanAndAttack, 10);
 
