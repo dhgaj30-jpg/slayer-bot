@@ -138,7 +138,7 @@ async function scanAndAttack() {
             return;
         }
 
-        const topComments = commentsList.slice(0, 5);
+        const topComments = commentsList.slice(0, 3);
 
         // 🔥 [تعديل السرعة 2] فحص التعليقين وجلب ردودهما بالتوازي التام في نفس الملي ثانية بدلاً من الانتظار بالترتيب
         await Promise.all(topComments.map(async (comment) => {
