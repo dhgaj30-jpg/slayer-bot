@@ -16,7 +16,7 @@ const TOKENS = [
     '7fae3d0d4e1b99ef48b916861064005416c2a217',
     '445d11b5491a80abb7d6755d076f5d7a752971c5',
     'b95ad4f0045438e07a86ddf76e3805eb5c245a7e',
-    'deaec3d7c88d6e94ab42ab93acfa298ca661c46'
+    '5deaec3d7c88d6e94ab42ab93acfa298ca661c46'
 ];
 
 const TARGET_ANIME_ID = 2025;
