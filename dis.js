@@ -8,15 +8,13 @@ const CLIENT_ID = 'android-app2';
 const CLIENT_SECRET = '7befba6263cc14c90d2f1d6da2c5cf9b251bfbbd';
 
 // مصفوفة التوكنات
+// مصفوفة التوكنات المحدثة (تم استبعاد حساب kft)
 const TOKENS = [
-    '24f06b373a5f26ff958c0aa7ff1c97f8a08bdf36',
-    'db6111e27a80f449433617b931c8d8483fed3ca1',
-    '6ad92e6921ead30c80dbdad594e1331562019bfc',
-    '8a803c183ed28eb632f1abfa10509ae2551a904f',
-    '7fae3d0d4e1b99ef48b916861064005416c2a217',
-    '445d11b5491a80abb7d6755d076f5d7a752971c5',
-    'b95ad4f0045438e07a86ddf76e3805eb5c245a7e',
-    '5deaec3d7c88d6e94ab42ab93acfa298ca661c46'
+    'cb759654c9e7fe7ae87e49fc6cd86dd8a1be8dcd', // harwnalnzy544@gmail.com
+    '65aeb482636a5f2877ccb84a262b679b973ccd00', // dalob5655@gmail.com
+    'c14c9bdea002f58ffe1822a361d8cfcbdb03977f', // dysd5042@gmail.com
+    '9fef055ec28a1062974ff6445cc71d7a84140ccc', // hdhe8707@gmail.com
+    '166f647bfae98eca54ee8645c96fa3420a2cdead'  // fshl72990@gmail.com
 ];
 
 const TARGET_ANIME_ID = 2025;
