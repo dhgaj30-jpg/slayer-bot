@@ -137,7 +137,7 @@ async function scanAndAttack() {
             return;
         }
 
-        const topComments = commentsList.slice(0, 5);
+        const topComments = commentsList.slice(0, 3);
 
         await Promise.all(topComments.map(async (comment) => {
             const commentId = comment.anime_comment_id;
