@@ -10,7 +10,7 @@ const CLIENT_SECRET = '7befba6263cc14c90d2f1d6da2c5cf9b251bfbbd';
 // 🔥 مصفوفة التوكنات الجديدة والمحدثة
 const TOKENS = [
     'cb759654c9e7fe7ae87e49fc6cd86dd8a1be8dcd', // harwnalnzy544@gmail.com
-    '65aeb482636a5f2877ccb84a262b679b973ccd00', // dalob5655@gmail.com
+    '65aeb482636a5f2877ccb84a262b679b973ccd00', // dalob5655@gوmail.com
     'c14c9bdea002f58ffe1822a361d8cfcbdb03977f', // dysd5042@gmail.com
     '9fef055ec28a1062974ff6445cc71d7a84140ccc', // hdhe8707@gmail.com
     '166f647bfae98eca54ee8645c96fa3420a2cdead'  // fshl72990@gmail.com
