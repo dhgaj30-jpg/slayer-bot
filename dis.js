@@ -1,13 +1,13 @@
 const axios = require('axios');
 const express = require('express');
-const https = require('https'); // استيتراد مكتبة الـ hthtpهs للتحكم بالاتصال
+const https = require('https'); 
 
-// الثوابت الأساسية
+// ==================== البيانات الأصلية كاملة ====================
 const MAIN_BASE_URL = 'https://anslayer.com/anime/public/anime-comments/';
 const CLIENT_ID = 'android-app2';
 const CLIENT_SECRET = '7befba6263cc14c90d2f1d6da2c5cf9b251bfbbd';
 
-// مصفوفة التوكنات
+// مصفوفة التوكنات الخاصة بك
 const TOKENS = [
     '24f06b373a5f26ff958c0aa7ff1c97f8a08bdf36',
     'db6111e27a80f449433617b931c8d8483fed3ca1',
@@ -17,6 +17,20 @@ const TOKENS = [
     '445d11b5491a80abb7d6755d076f5d7a752971c5',
     'b95ad4f0045438e07a86ddf76e3805eb5c245a7e',
     '5deaec3d7c88d6e94ab42ab93acfa298ca661c46'
+];
+
+// قائمة الأسماء المستهدفة بالـ Dislike (يمكنك تعديلها أو إضافة أسماء أخرى هنا)
+const TARGET_USERS = [
+    'شهاب الليبي',
+    'شهاب السوري',
+    'شهاب المغربي',
+    'الزعيم شِهاب',
+    'شِهاب',
+    'العقيد شِهَاب',
+    'شِهَاب',
+    'شِهَاب الافريقي',
+    'شِهاب الجزائري',
+    'الجنرال شهاب'
 ];
 
 const TARGET_ANIME_ID = 2025;
@@ -33,16 +47,16 @@ let WORKING_ENDPOINT = null;
 const processedReplies = new Set();
 let isScanning = false;
 
-// 🔥 [تعديل السرعة 1] إنشاء عميل Axios فائق السرعة يحافظ على الاتصال مفتوحاً دائماً 24/7
+// إنشاء عميل Axios يحافظ على الاتصال مفتوحاً
 const httpAgent = new https.Agent({ 
     keepAlive: true, 
-    maxSockets: 100, // السماح بفتح حتى 100 اتصال متوازي للسيرفر
+    maxSockets: 100, 
     keepAliveMsecs: 30000 
 });
 
 const fastAxios = axios.create({
     httpsAgent: httpAgent,
-    timeout: 5000 // مهلة الطلب 5 ثوانٍ لعدم تعليق السكربت في حال لاق السيرفر
+    timeout: 5000 
 });
 
 // ===================================================================
@@ -95,103 +109,10 @@ async function hitDislike(token, commentId, replyId) {
 async function attackReply(commentId, replyId, text, author) {
     console.log(`\n⚔️ الهجوم على الرد: [${replyId}] للكاتب [${author}] - "${text.substring(0, 30)}..."`);
 
-    // إرسال الدس لايك من كل الحسابات بالتوازي التام فوراً
     const dislikePromises = TOKENS.map(async (token, index) => {
         try {
             await hitDislike(token, commentId, replyId);
             console.log(`✅ [الحساب ${index + 1}]: تمت إضافة الدس لايك بنجاح!`);
-        } catch (error) {
-            console.error(`❌ [الحساب ${index + 1}]: فشل - ${error.response?.data?.detail || error.message}`);
-        }
-    });
-
-    await Promise.all(dislikePromises);
-    console.log(`✅ انتهت موجة الهجوم على الرد [${replyId}].`);
-}
-
-async function scanAndAttack() {
-    if (isScanning) return;
-    isScanning = true;
-
-    try {
-        if (processedReplies.size > 1000) {
-            processedReplies.clear();
-            console.log('\n🧹 [تنظيف] تم تفريغ ذاكرة الردود القديمة للحفاظ على الأداء.\n');
-        }
-
-        const jsonQuery = encodeURIComponent(JSON.stringify({ anime_id: TARGET_ANIME_ID, page: 1 }));
-        const commentsRes = await fastAxios.get(`${MAIN_BASE_URL}get-anime-comments?json=${jsonQuery}`, {
-            headers: {
-                'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 11; Build/RP1A.200720.011)',
-                'Client-Id': CLIENT_ID,
-                'Client-Secret': CLIENT_SECRET,
-                'X-Requested-With': 'com.anslayer.app'
-            }
-        });
-
-        const commentsList = commentsRes.data?.response?.data || [];
-        if (commentsList.length === 0) {
-            isScanning = false;
-            return;
-        }
-
-        const topComments = commentsList.slice(0, 2);
-
-        // 🔥 [تعديل السرعة 2] فحص التعليقين وجلب ردودهما بالتوازي التام في نفس الملي ثانية بدلاً من الانتظار بالترتيب
-        await Promise.all(topComments.map(async (comment) => {
-            const commentId = comment.anime_comment_id;
-            const repliesQuery = encodeURIComponent(JSON.stringify({ anime_comment_id: commentId, page: 1 }));
-
-            try {
-                const repliesRes = await fastAxios.get(`${MAIN_BASE_URL}get-anime-comment-replies?json=${repliesQuery}`, {
-                    headers: {
-                        'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 11; Build/RP1A.200720.011)',
-                        'Client-Id': CLIENT_ID,
-                        'Client-Secret': CLIENT_SECRET,
-                        'X-Requested-With': 'com.anslayer.app'
-                    }
-                });
-
-                const repliesList = repliesRes.data?.response?.data || [];
-                const newReplies = repliesList.filter(reply => !processedReplies.has(reply.anime_comment_reply_id));
-
-                if (newReplies.length > 0) {
-                    console.log(`\n🚨 [رادار] رصد ${newReplies.length} ردود جديدة في التعليق رقم [${commentId}]...`);
-
-                    // 🔥 [تعديل السرعة 3] إذا تم رصد أكثر من رد جديد، يتم الهجوم عليها بالتوازي فوراً دون انتظار الرد الأول لينتهي
-                    await Promise.all(newReplies.map(async (reply) => {
-                        processedReplies.add(reply.anime_comment_reply_id);
-                        await attackReply(
-                            commentId,
-                            reply.anime_comment_reply_id,
-                            reply.reply_text,
-                            reply.user_full_name
-                        );
-                    }));
-                }
-            } catch (err) {
-                // تجاهل أخطاء جلب الردود الفردية لضمان استمرار الفحص للتعليق الآخر
-            }
-        }));
-
-    } catch (error) {
-        console.error('\n❌ خطأ أثناء دورة الفحص:', error.message);
-    }
-
-    isScanning = false;
-}
-
-// 🔥 [تعديل السرعة 4] تكرار لا نهائي فوري (0 ملي ثانية خمول) بدون قيود الـ setInterval
-function startLoop() {
-    scanAndAttack().then(() => {
-        setImmediate(startLoop); // تبدأ الدورة التالية فوراً بعد انتهاء السابقة مباشرة
-    });
-}
-
-console.log('🚀 بدء تشغيل رادار الردود المستمر بالسرعة القصوى الممكنة...');
-console.log('📡 يتم الفحص بالتوازي التام وبدون فترات خمول...\n');
-
-startLoop();
         } catch (error) {
             console.error(`❌ [الحساب ${index + 1}]: فشل - ${error.response?.data?.detail || error.message}`);
         }
@@ -250,9 +171,9 @@ async function scanAndAttack() {
                     await Promise.all(newReplies.map(async (reply) => {
                         processedReplies.add(reply.anime_comment_reply_id);
                         
-                        // 🔍 فحص الأمان واستهداف الاسم المطلوب فقط
+                        // فحص الأمان واستهداف الأسماء المحددة فقط في القائمة
                         if (TARGET_USERS.length > 0 && TARGET_USERS.includes(reply.user_full_name)) {
-                            console.log(`\n🚨 [رادار] تم رصد رد جديد يطابق حسابك المستهدف [${reply.user_full_name}]`);
+                            console.log(`\n🚨 [رادار] تم رصد رد جديد يطابق الحساب المستهدف [${reply.user_full_name}]`);
                             await attackReply(
                                 commentId,
                                 reply.anime_comment_reply_id,
@@ -263,7 +184,7 @@ async function scanAndAttack() {
                     }));
                 }
             } catch (err) {
-                // تجاهل الأخطاء الفردية
+                // تجاهل الأخطاء الفردية لضمان استمرار الفحص
             }
         }));
 
@@ -274,7 +195,7 @@ async function scanAndAttack() {
     isScanning = false;
 }
 
-// ⏱️ استبدال الـ setImmediate بـ setTimeout بقيمة 500ms لمنع استهلاك معالج Render وحظر السكربت
+// التكرار المستقر لضمان عدم حظر الاستضافة
 function startLoop() {
     scanAndAttack().then(() => {
         setTimeout(startLoop, 50); 
@@ -282,6 +203,107 @@ function startLoop() {
 }
 
 console.log('🚀 بدء تشغيل رادار الردود المستقر والموجه...');
-console.log('📡 يتم الفحص بذكاء لضمان استقرار السيرفر على منصة الاستضافة...\n');
+console.log('📡 يتم الفحص بذكاء لضمان استقرار السيرفر...\n');
+
+startLoop();
+    console.log(`\n⚔️ الهجوم بالـ Dislike على الرد: [${replyId}] للكاتب [${author}] - "${text.substring(0, 30)}..."`);
+
+    // إرسال الدس لايك من كل الحسابات بالتوازي التام فوراً
+    const dislikePromises = TOKENS.map(async (token, index) => {
+        try {
+            await hitDislike(token, commentId, replyId);
+            console.log(`✅ [الحساب ${index + 1}]: تمت إضافة الدس لايك بنجاح!`);
+        } catch (error) {
+            console.error(`❌ [الحساب ${index + 1}]: فشل - ${error.response?.data?.detail || error.message}`);
+        }
+    });
+
+    await Promise.all(dislikePromises);
+    console.log(`✅ انتهت موجة الهجوم على الرد [${replyId}].`);
+}
+
+async function scanAndAttack() {
+    if (isScanning) return;
+    isScanning = true;
+
+    try {
+        if (processedReplies.size > 1000) {
+            processedReplies.clear();
+            console.log('\n🧹 [تنظيف] تم تفريغ ذاكرة الردود القديمة للحفاظ على الأداء.\n');
+        }
+
+        const jsonQuery = encodeURIComponent(JSON.stringify({ anime_id: TARGET_ANIME_ID, page: 1 }));
+        const commentsRes = await fastAxios.get(`${MAIN_BASE_URL}get-anime-comments?json=${jsonQuery}`, {
+            headers: {
+                'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 11; Build/RP1A.200720.011)',
+                'Client-Id': CLIENT_ID,
+                'Client-Secret': CLIENT_SECRET,
+                'X-Requested-With': 'com.anslayer.app'
+            }
+        });
+
+        const commentsList = commentsRes.data?.response?.data || [];
+        if (commentsList.length === 0) {
+            isScanning = false;
+            return;
+        }
+
+        const topComments = commentsList.slice(0, 3);
+
+        // فحص التعليقات وجلب ردودها بالتوازي التام
+        await Promise.all(topComments.map(async (comment) => {
+            const commentId = comment.anime_comment_id;
+            const repliesQuery = encodeURIComponent(JSON.stringify({ anime_comment_id: commentId, page: 1 }));
+
+            try {
+                const repliesRes = await fastAxios.get(`${MAIN_BASE_URL}get-anime-comment-replies?json=${repliesQuery}`, {
+                    headers: {
+                        'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 11; Build/RP1A.200720.011)',
+                        'Client-Id': CLIENT_ID,
+                        'Client-Secret': CLIENT_SECRET,
+                        'X-Requested-With': 'com.anslayer.app'
+                    }
+                });
+
+                const repliesList = repliesRes.data?.response?.data || [];
+                const newReplies = repliesList.filter(reply => !processedReplies.has(reply.anime_comment_reply_id));
+
+                if (newReplies.length > 0) {
+                    await Promise.all(newReplies.map(async (reply) => {
+                        processedReplies.add(reply.anime_comment_reply_id);
+                        
+                        // 🔍 فحص الأمان واستهداف الأسماء المطلوبة فقط في قائمة شهاب
+                        if (TARGET_USERS.includes(reply.user_full_name)) {
+                            console.log(`\n🚨 [رادار] تم رصد رد جديد يطابق الحساب المستهدف [${reply.user_full_name}]`);
+                            await attackReply(
+                                commentId,
+                                reply.anime_comment_reply_id,
+                                reply.reply_text,
+                                reply.user_full_name
+                            );
+                        }
+                    }));
+                }
+            } catch (err) {
+                // تجاهل الأخطاء الفردية لضمان استمرارية الفحص
+            }
+        }));
+
+    } catch (error) {
+        console.error('\n❌ خطأ أثناء دورة الفحص:', error.message);
+    }
+
+    isScanning = false;
+}
+
+// حلقة الفحص والتكرار المستقر لمنع استهلاك معالج منصة الاستضافة
+function startLoop() {
+    scanAndAttack().then(() => {
+        setTimeout(startLoop, 50); 
+    });
+}
+
+console.log('🚀 بدء تشغيل رادار الردود المستقر والموجه...');
+console.log('📡 يتم الفحص بذكاء وتوجيه الدس لايك لحسابات شهاب فقط...\n');
 
 startLoop();
