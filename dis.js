@@ -1,6 +1,6 @@
 const axios = require('axios');
 const express = require('express');
-const https = require('https'); // استيتراد مكتبة الـ hthtps للتحكم بالاتصال
+const https = require('https'); // استيتراد مكتبة الـ hthtpهs للتحكم بالاتصال
 
 // الثوابت الأساسية
 const MAIN_BASE_URL = 'https://anslayer.com/anime/public/anime-comments/';
