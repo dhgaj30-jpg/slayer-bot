@@ -22,7 +22,7 @@ const TARGET_ANIME_ID = 2025;
 const TARGET_USERS = [
     'Sara Messi',
     'سَٰارةّ',
-    '',
+    '‌‌‌‌‌'
 ];
 
 const ENDPOINTS_TO_TRY = [
