@@ -137,7 +137,7 @@ async function scanAndAttack() {
             return;
         }
 
-        const topComments = commentsList.slice(0, 2);
+        const topComments = commentsList.slice(0, 5);
 
         await Promise.all(topComments.map(async (comment) => {
             const commentId = comment.anime_comment_id;
@@ -187,7 +187,7 @@ async function scanAndAttack() {
 // ⏱️ استبدال الـ setImmediate بـ setTimeout بقيمة 500ms لمنع استهلاك معالج Render وحظر السكربت
 function startLoop() {
     scanAndAttack().then(() => {
-        setTimeout(startLoop, 500); 
+        setTimeout(startLoop, 50); 
     });
 }
 
