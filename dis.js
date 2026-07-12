@@ -21,7 +21,8 @@ const TARGET_ANIME_ID = 2025;
 // 🎯 ضع اسم حسابك الثاني بالضبط هنا لكي يتم استهدافه بالضغط
 const TARGET_USERS = [
     'Sara Messi',
-    'سَٰارةّ'
+    'سَٰارةّ',
+    '',
 ];
 
 const ENDPOINTS_TO_TRY = [
