@@ -6,7 +6,7 @@ const MAIN_BASE_URL = 'https://anslayer.com/anime/public/anime-comments/';
 const CLIENT_ID = 'android-app2';
 const CLIENT_SECRET = '7befba6263cc14c90d2f1d6da2c5cf9b251bfbbd';
 
-// مصفوفة التوكنات
+// مصفوفة تالتوكنات
 const TOKENS = [
     '994a91252f164322e31ac1c6816d3e5c00a851ef',
     '9942d498ff4b9c56d3412c62094e02410df302cf',
