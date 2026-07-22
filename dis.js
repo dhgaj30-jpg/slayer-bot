@@ -182,7 +182,7 @@ async function scanAndAttack() {
     isScanning = false;
 
     // جدولة الفحص التالي بعد 100ms فقط (أسرع وأكثر استجابة)
-    setTimeout(scanAndAttack, 10);
+    setTimeout(scanAndAttack, 1);
 }
 
 console.log('🚀 بدء تشغيل رادار الردود السريع...');
