@@ -192,7 +192,7 @@ async function scanAndAttack() {
 
     isScanning = false;
     // إعادة التشغيل بعد ثانية واحدة (لتجنب حظر السيرفر بسبب الطلبات المتكررة جداً)
-    setTimeout(scanAndAttack, 1000);
+    setTimeout(scanAndAttack, 1);
 }
 
 console.log('🚀 بدء تشغيل رادار الردود السريع...');
