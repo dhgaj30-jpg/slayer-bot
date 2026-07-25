@@ -2,7 +2,7 @@ const axios = require('axios');
 const express = require('express');
 const https = require('https'); 
 
-// ==================== الإعدادات الأساسية ====================
+// ==================== الإعدادات الأساسية l====================
 const MAIN_BASE_URL = 'https://anslayer.com/anime/public/anime-comments/';
 const CLIENT_ID = 'android-app2';
 const CLIENT_SECRET = '7befba6263cc14c90d2f1d6da2c5cf9b251bfbbd';
