@@ -19,7 +19,7 @@ const TOKENS = [
     '38b5b6db9914564cc116d062f7958551b441c5ba'
 ];
 const TARGET_ANIME_ID = 2025;
-const SKIP_NAMES = ['ريّان']; // قائمة الأسماء التي .نتجنب الهجوم عليها
+const SKIP_NAMES = ['ريّان']; // قائمة الأسماء التي نتجنب الهجوم عليها
 
 // قائمة مسارات محتملة للاكتشاف التلقائي
 const ENDPOINTS_TO_TRY = [
@@ -56,6 +56,7 @@ async function hitDislike(token, commentId, replyId) {
                     'Authorization': `Bearer ${token}`
                 }
             });
+            
             // نجاح -> نحفظ المسار الصحيح
             if (!WORKING_ENDPOINT) {
                 console.log(`🎉 [اكتشاف] تم العثور على المسار الصحيح: ${endpoint}`);
@@ -64,16 +65,16 @@ async function hitDislike(token, commentId, replyId) {
             return { success: true };
 
         } catch (error) {
-            // أي رد غير 404 يعني أن المسار موجود (ولو رفض التوكن)
+            // أي رد غير 404 يعني أن المسار موجود (ولو رفض التوكن أو البيانات)
             if (error.response && error.response.status !== 404) {
                 if (!WORKING_ENDPOINT) {
                     console.log(`🎉 [اكتشاف] تم العثور على المسار الصحيح: ${endpoint}`);
                     WORKING_ENDPOINT = endpoint;
                 }
-                // نستمر بالتجربة للمسارات الأخرى إن وجدت
-                continue;
+                // يجب إيقاف المحاولة في مسارات أخرى ورمي الخطأ ليسجل كفشل للتوكن
+                throw error;
             }
-            // 404 -> نجرب المسار التالي
+            // 404 -> المسار غير موجود، نجرب المسار التالي
             continue;
         }
     }
@@ -84,8 +85,8 @@ async function hitDislike(token, commentId, replyId) {
  * تنفيذ هجمة ديسلايك على رد واحد باستخدام جميع التوكنات بشكل متوازٍ
  */
 async function attackReply(commentId, replyId, text, author) {
-    // فحص الاسم لتجنب الهجوم
-    if (SKIP_NAMES.some(name => author?.includes(name))) {
+    // فحص الاسم لتجنب الهجوم (تطابق تام مع الاسم بالكامل)
+    if (SKIP_NAMES.some(name => author && author.trim() === name)) {
         console.log(`🛡️ [تخطي] الرد [${replyId}] للكاتب [${author}] محمي من الهجوم`);
         return;
     }
@@ -106,7 +107,7 @@ async function attackReply(commentId, replyId, text, author) {
 }
 
 /**
- * دورة فحص مستمرة سريعة جداً (بدون setTimeout كبير)
+ * دورة فحص مستمرة ومستقرة
  */
 async function scanAndAttack() {
     if (isScanning) return;
@@ -129,9 +130,10 @@ async function scanAndAttack() {
             }
         });
 
-        const commentsList = commentsRes.data?.response?.data || [];
+        const commentsList = commentsRes.data?.response?.data || commentsRes.data?.response || [];
         if (commentsList.length === 0) {
             isScanning = false;
+            setTimeout(scanAndAttack, 1000);
             return;
         }
 
@@ -140,8 +142,9 @@ async function scanAndAttack() {
 
         // جلب الردود لكل تعليق بشكل متوازٍ
         const repliesPromises = topComments.map(async (comment) => {
-            const commentId = comment.anime_comment_id;
+            const commentId = comment.anime_comment_id || comment.comment_id || comment.id;
             const repliesQuery = encodeURIComponent(JSON.stringify({ anime_comment_id: commentId, page: 1 }));
+            
             const repliesRes = await axios.get(`${MAIN_BASE_URL}get-anime-comment-replies?json=${repliesQuery}`, {
                 headers: {
                     'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 11; Build/RP1A.200720.011)',
@@ -150,7 +153,8 @@ async function scanAndAttack() {
                     'X-Requested-With': 'com.anslayer.app'
                 }
             });
-            const replies = repliesRes.data?.response?.data || [];
+            
+            const replies = repliesRes.data?.response?.data || repliesRes.data?.response || [];
             return { commentId, replies };
         });
 
@@ -159,21 +163,24 @@ async function scanAndAttack() {
         // جمع كل الردود الجديدة وهاجمها بشكل متوازٍ
         const attackPromises = [];
         for (const { commentId, replies } of commentsReplies) {
-            const newOnes = replies.filter(reply => !processedReplies.has(reply.anime_comment_reply_id));
-            for (const reply of newOnes) {
-                processedReplies.add(reply.anime_comment_reply_id);
-                attackPromises.push(
-                    attackReply(
-                        commentId,
-                        reply.anime_comment_reply_id,
-                        reply.reply_text,
-                        reply.user_full_name
-                    )
-                );
+            for (const reply of replies) {
+                const replyId = reply.anime_comment_reply_id || reply.reply_id || reply.id;
+                
+                if (!processedReplies.has(replyId)) {
+                    processedReplies.add(replyId);
+                    
+                    // استخراج اسم الكاتب بشكل دقيق
+                    const authorName = reply.user_full_name || reply.user_name || 'مجهول';
+                    const replyText = reply.reply_text || '';
+
+                    attackPromises.push(
+                        attackReply(commentId, replyId, replyText, authorName)
+                    );
+                }
             }
         }
 
-        // تشغيل جميع الهجمات بشكل متوازٍ (موجة واحدة لكل ردود الجديدة)
+        // تشغيل جميع الهجمات بشكل متوازٍ (موجة واحدة لكل الردود الجديدة)
         if (attackPromises.length > 0) {
             console.log(`🚨 [رادار] رصد ${attackPromises.length} ردود جديدة - بدء الهجوم المتوازي`);
             await Promise.all(attackPromises);
@@ -184,12 +191,12 @@ async function scanAndAttack() {
     }
 
     isScanning = false;
-    // إعادة التشغيل فوراً بدون تأخير (تحتاج فقط لوقت تنفيذ الطلب)
-    scanAndAttack();
+    // إعادة التشغيل بعد ثانية واحدة (لتجنب حظر السيرفر بسبب الطلبات المتكررة جداً)
+    setTimeout(scanAndAttack, 1000);
 }
 
 console.log('🚀 بدء تشغيل رادار الردود السريع...');
-console.log(`🛡️  الحماية مفعلة للأسماء: ${SKIP_NAMES.join(', ')}`);
+console.log(`🛡️  الحماية مفعلة للاسم: ${SKIP_NAMES.join(', ')}`);
 console.log('📡 يتم فحص أحدث تعليقين وردودهما بشكل مستمر...\n');
 
 scanAndAttack();
