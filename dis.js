@@ -19,7 +19,7 @@ const TOKENS = [
     '38b5b6db9914564cc116d062f7958551b441c5ba'
 ];
 const TARGET_ANIME_ID = 2025;
-const SKIP_NAMES = ['ريّان']; // قائمة الأسماء التي نتجنب الهجوم عليها
+const SKIP_NAMES = ['ريّان']; // قائمة الأسماء التي .نتجنب الهجوم عليها
 
 // قائمة مسارات محتملة للاكتشاف التلقائي
 const ENDPOINTS_TO_TRY = [
