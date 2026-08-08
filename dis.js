@@ -9,16 +9,56 @@ const CLIENT_SECRET = '7befba6263cc14c90d2f1d6da2c5cf9b251bfbbd';
 
 // توكنات الدسات الخاصة بك (10 حسابات)
 const TOKENS = [
-    '24f06b373a5f26ff958c0aa7ff1c97f8a08bdf36',
-    'db6111e27a80f449433617b931c8d8483fed3ca1',
-    '6ad92e6921ead30c80dbdad594e1331562019bfc',
-    '8a803c183ed28eb632f1abfa10509ae2551a904f',
-    '7fae3d0d4e1b99ef48b916861064005416c2a217',
-    '445d11b5491a80abb7d6755d076f5d7a752971c5',
-    'b95ad4f0045438e07a86ddf76e3805eb5c245a7e',
-    '994a91252f164322e31ac1c6816d3e5c00a851ef',
-    '9942d498ff4b9c56d3412c62094e02410df302cf',
-    '38b5b6db9914564cc116d062f7958551b441c5ba'
+    'a2b5a4f28c62481695e1b0a4219cc94176b47352', // ghlam7464
+    '5b9f382c5d6fa032b021b0bf5b66cf539f0b60a6', // jeeb81504
+    'fae3ff77f03080f1070b17a4e4bae340ed5cbaf7', // lodhsh163
+    '728fc409067972b0a08650a49d5d2d926293e2d7', // hdfj1004
+    '6de86ba566c3aecc2a3ed21e63b10fbbc7365fba', // halabno225
+    '4edbf9b70dcaaae14b172a56191049278b236e0f', // jmalw482
+    '2c02ee3398d7c5aadba7037c0be5a754ced42738', // diraralaysh
+    'bc0ffb18beb4ee805b9ff5c0ac25d982e5f3b0a0', // ojdidhd2
+    '1d48bcc839905c7e409e1aea21e116bed4a9344f', // lffk689
+    'd1a83149377e8c867d46f5351024d6e6fca0b4d5', // hjk67175
+    '5b2c079537f181b2bc2294c0a2be0dc86602aa97', // itfhuuu
+    'aea36acf58fb783ee9fbe7ad1549709b330d11d2', // rakanjamalrj21
+    '220b4c0f99e4c484fe7c518450e13366d72de2ec', // daloop101d
+    '14d40bc15d019ee42b8ad22e36586ff85d47d38a', // sem80142
+    'd10f1626cc91e4f6c5b90671dbd52a2377092be2', // rayanjamalderar
+    '37f54f7e301c60b36f214e6c67b088555042d017', // derar4jamal
+    '27ec5260282859683a58e00a4d1a97a4daaf939a', // dryj2008
+    '33d2c1a077f0281ecf3950170ef3ce6a461a7f08', // baraskyr
+    '5899bd55f346b9048ff65342913c658066e03676', // drarjmal511
+    'c76c37baf136e888586e85862d6bc164f6fba87c', // polahr1292
+    '7e760bd74826674720b24e012f9d8f561515c8c9', // fshl72990
+    '59a5bb39862317e9aed2c543d5851f346d3a4fd5', // hdhe8707
+    '8b5274dbadc627e923c656ae5f7be5204fe3e2ee', // dysd5042
+    'c91cdd271f02468bc6b1a611a7b647703a31c560', // dalob5655
+    '8657137866d1d2f2b1458e69c6f20984c04731ca', // harwnalnzy544
+    'b1ac3b6e20e65a63009fb36c31b43d018b81e787', // kft76021
+    'b896727da1397c2216b0a68ddd79881ce951983e', // xvjd0530
+    '88df8d9388209d5ab97c120c49fd6ca71ceecb29', // shhe6674
+    '744ee1798ea4317bf9dd4dc2ecf39961337e2ee8', // sekdshjs
+    'c8c90bbeef1227f0b083f1ecb1c9593b22c7e22a', // sbow871
+    '632d0c4b5c24b1764f326fb05258121bdb66b1dd', // sggs8700
+    '58b4dee8f6a2e5e1bb2e37557acccfaad5ba561d', // xbef1124
+    '92396b80fa4f6383a031a1e13aa0ba855ef5cbed', // hdjf7199
+    'a0b0a0f92fb775533c50b5e1f88d29e5806b9ea4', // sjheikw
+    '5bc8de94bf5031d5d6f673cfe936139b7cdec677', // byg22348
+    'bcacd28f2b97309eeb53c955d372d31734aa2f03', // kdnw880
+    '6a2fd615edfd44a98843b1597bdea5973456ab33', // jehu05971
+    '13a00af3523f3e8ff0d8469c9ad4d0e822e220f2', // difl65789
+    'db5f7cc02b423e988d445739776ffbeebd9786cf', // jhbn70905
+    '8f418427b54106fe5808ab9c06ac9b530341673a', // rpot14066
+    '00c986418a36123625c7bf742b8832dc524a80c5', // rayanjamalrj21
+    '69adc573ad676acbf6e67ccbb3bcb3785f4b5ab4', // norahjamal511
+    '7dcecbe38e81eb93c0d96df24d0616e99d1f2bbf', // offlod9
+    '6d17ef7f5fab602d91361860017f3415a15814da', // rayanderarjamal
+    'a6a23cdbae707bf9977af78ba0d4cd2eb298e4dc', // jsbdhddj0
+    'dc0ced10bb1a40e4add562c7b39916a89d9cc130',
+    '44d665eae5f63a5d12f89d9cd802545cde9f9317',
+    '472cb3c672d065ea8b994dc33eae6d3e35abf280',
+    '00fc00af05795beffd0dd9cc825b23cc9e661926',
+    '2af0f99708b6db9d93a8baecd28c9048a4d3a4a8'
 ];
 const TARGET_ANIME_ID = 2025;
 const SKIP_NAME = 'ريّان';
