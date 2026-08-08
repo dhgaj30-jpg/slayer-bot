@@ -9,15 +9,6 @@ const CLIENT_SECRET = '7befba6263cc14c90d2f1d6da2c5cf9b251bfbbd';
 
 // توكنات الدسات الخاصة بك (10 حسابات)
 const TOKENS = [
-    'aea36acf58fb783ee9fbe7ad1549709b330d11d2', // rakanjamalrj21
-    '220b4c0f99e4c484fe7c518450e13366d72de2ec', // daloop101d
-    '14d40bc15d019ee42b8ad22e36586ff85d47d38a', // sem80142
-    'd10f1626cc91e4f6c5b90671dbd52a2377092be2', // rayanjamalderar
-    '37f54f7e301c60b36f214e6c67b088555042d017', // derar4jamal
-    '27ec5260282859683a58e00a4d1a97a4daaf939a', // dryj2008
-    '33d2c1a077f0281ecf3950170ef3ce6a461a7f08', // baraskyr
-    '5899bd55f346b9048ff65342913c658066e03676', // drarjmal511
-    'c76c37baf136e888586e85862d6bc164f6fba87c', // polahr1292
     '7e760bd74826674720b24e012f9d8f561515c8c9', // fshl72990
     '59a5bb39862317e9aed2c543d5851f346d3a4fd5', // hdhe8707
     '8b5274dbadc627e923c656ae5f7be5204fe3e2ee', // dysd5042
