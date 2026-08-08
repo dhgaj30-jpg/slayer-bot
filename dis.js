@@ -9,17 +9,6 @@ const CLIENT_SECRET = '7befba6263cc14c90d2f1d6da2c5cf9b251bfbbd';
 
 // توكنات الدسات الخاصة بك (10 حسابات)
 const TOKENS = [
-    'a2b5a4f28c62481695e1b0a4219cc94176b47352', // ghlam7464
-    '5b9f382c5d6fa032b021b0bf5b66cf539f0b60a6', // jeeb81504
-    'fae3ff77f03080f1070b17a4e4bae340ed5cbaf7', // lodhsh163
-    '728fc409067972b0a08650a49d5d2d926293e2d7', // hdfj1004
-    '6de86ba566c3aecc2a3ed21e63b10fbbc7365fba', // halabno225
-    '4edbf9b70dcaaae14b172a56191049278b236e0f', // jmalw482
-    '2c02ee3398d7c5aadba7037c0be5a754ced42738', // diraralaysh
-    'bc0ffb18beb4ee805b9ff5c0ac25d982e5f3b0a0', // ojdidhd2
-    '1d48bcc839905c7e409e1aea21e116bed4a9344f', // lffk689
-    'd1a83149377e8c867d46f5351024d6e6fca0b4d5', // hjk67175
-    '5b2c079537f181b2bc2294c0a2be0dc86602aa97', // itfhuuu
     'aea36acf58fb783ee9fbe7ad1549709b330d11d2', // rakanjamalrj21
     '220b4c0f99e4c484fe7c518450e13366d72de2ec', // daloop101d
     '14d40bc15d019ee42b8ad22e36586ff85d47d38a', // sem80142
@@ -184,7 +173,7 @@ async function scanAndAttack() {
             return;
         }
 
-        const topComments = commentsList.slice(0, 2);
+        const topComments = commentsList.slice(0, 1);
 
         await Promise.all(topComments.map(async (comment) => {
             const commentId = comment.anime_comment_id;
@@ -233,7 +222,7 @@ async function scanAndAttack() {
 function startLoop() {
     scanAndAttack().then(() => {
         // رجعنا السرعة لـ 25 ملي ثانية بناءً على قوة الكود!
-        setTimeout(startLoop, 15); 
+        setTimeout(startLoop, 100); 
     });
 }
 
