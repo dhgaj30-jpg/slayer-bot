@@ -34,11 +34,6 @@ const TOKENS = [
     '7dcecbe38e81eb93c0d96df24d0616e99d1f2bbf', // offlod9
     '6d17ef7f5fab602d91361860017f3415a15814da', // rayanderarjamal
     'a6a23cdbae707bf9977af78ba0d4cd2eb298e4dc', // jsbdhddj0
-    'dc0ced10bb1a40e4add562c7b39916a89d9cc130',
-    '44d665eae5f63a5d12f89d9cd802545cde9f9317',
-    '472cb3c672d065ea8b994dc33eae6d3e35abf280',
-    '00fc00af05795beffd0dd9cc825b23cc9e661926',
-    '2af0f99708b6db9d93a8baecd28c9048a4d3a4a8'
 ];
 const TARGET_ANIME_ID = 2025;
 const SKIP_NAME = 'ريّان';
