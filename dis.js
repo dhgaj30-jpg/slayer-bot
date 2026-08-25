@@ -9,31 +9,10 @@ const CLIENT_SECRET = '7befba6263cc14c90d2f1d6da2c5cf9b251bfbbd';
 
 // توكنات الدسات الخاصة بك (10 حسابات)
 const TOKENS = [
-    '7e760bd74826674720b24e012f9d8f561515c8c9', // fshl72990
-    '59a5bb39862317e9aed2c543d5851f346d3a4fd5', // hdhe8707
-    '8b5274dbadc627e923c656ae5f7be5204fe3e2ee', // dysd5042
-    'c91cdd271f02468bc6b1a611a7b647703a31c560', // dalob5655
-    '8657137866d1d2f2b1458e69c6f20984c04731ca', // harwnalnzy544
-    'b1ac3b6e20e65a63009fb36c31b43d018b81e787', // kft76021
-    'b896727da1397c2216b0a68ddd79881ce951983e', // xvjd0530
-    '88df8d9388209d5ab97c120c49fd6ca71ceecb29', // shhe6674
-    '744ee1798ea4317bf9dd4dc2ecf39961337e2ee8', // sekdshjs
-    'c8c90bbeef1227f0b083f1ecb1c9593b22c7e22a', // sbow871
-    '632d0c4b5c24b1764f326fb05258121bdb66b1dd', // sggs8700
-    '58b4dee8f6a2e5e1bb2e37557acccfaad5ba561d', // xbef1124
-    '92396b80fa4f6383a031a1e13aa0ba855ef5cbed', // hdjf7199
-    'a0b0a0f92fb775533c50b5e1f88d29e5806b9ea4', // sjheikw
-    '5bc8de94bf5031d5d6f673cfe936139b7cdec677', // byg22348
-    'bcacd28f2b97309eeb53c955d372d31734aa2f03', // kdnw880
-    '6a2fd615edfd44a98843b1597bdea5973456ab33', // jehu05971
-    '13a00af3523f3e8ff0d8469c9ad4d0e822e220f2', // difl65789
-    'db5f7cc02b423e988d445739776ffbeebd9786cf', // jhbn70905
-    '8f418427b54106fe5808ab9c06ac9b530341673a', // rpot14066
-    '00c986418a36123625c7bf742b8832dc524a80c5', // rayanjamalrj21
-    '69adc573ad676acbf6e67ccbb3bcb3785f4b5ab4', // norahjamal511
-    '7dcecbe38e81eb93c0d96df24d0616e99d1f2bbf', // offlod9
-    '6d17ef7f5fab602d91361860017f3415a15814da', // rayanderarjamal
-    'a6a23cdbae707bf9977af78ba0d4cd2eb298e4dc', // jsbdhddj0
+    'ab03d7f20c753a0375a7d52647f60fb9b475eaa4', // fshl72990
+    'bbeeba74c11b1eede2d2e33d855e8dc3779782dd', // hdhe8707
+    'ba3e81f3108294c289af82ac6e7138632290344e', // offlod9
+    '5a4610c296d25043f48b4ac9f4b652541929199f'// rayanderarjamal
 ];
 const TARGET_ANIME_ID = 2025;
 const SKIP_NAME = 'ريّان';
