@@ -15,7 +15,7 @@ const TOKENS = [
     '5a4610c296d25043f48b4ac9f4b652541929199f'// rayanderarjamal
 ];
 const TARGET_ANIME_ID = 2025;
-const SKIP_NAME = '';
+const SKIP_NAME = 'مُهند';
 
 const DISLIKE_ENDPOINTS_TO_TRY = [
     'anime-comment-reply-dislike',
@@ -138,7 +138,7 @@ async function scanAndAttack() {
             return;
         }
 
-        const topComments = commentsList.slice(0, 3);
+        const topComments = commentsList.slice(0, 2);
 
         await Promise.all(topComments.map(async (comment) => {
             const commentId = comment.anime_comment_id;
