@@ -15,7 +15,7 @@ const TOKENS = [
     '5a4610c296d25043f48b4ac9f4b652541929199f'// rayanderarjamal
 ];
 const TARGET_ANIME_ID = 2025;
-const SKIP_NAME = 'ريّان';
+const SKIP_NAME = '';
 
 const DISLIKE_ENDPOINTS_TO_TRY = [
     'anime-comment-reply-dislike',
