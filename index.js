@@ -1,151 +1,288 @@
-// dislike_all_replies_2_comments.js
-const axios = require('axios');
-const https = require('https');
+// ==========================================
+// ⚙️ إعدادات الوقت (يمكنك تعديلها من هنا)
+// ==========================================
+// الأرقام بالملي ثانية (1 دقيقة = 60000 ملي ثانية)q
 
-const BASE = 'https://anslayer.com/anime/public/anime-comments/';
+const ANIME_1_ID = 2025;
+const ANIME_1_LOOP_TIME = 3 * 70 * 1000; // يعيد كل 3 دقائق
+
+const ANIME_2_ID = 14029;
+const ANIME_2_FIRST_DELAY = 1 * 61 * 1000; // يرسل أول مرة بعد دقيقة واحدة من تشغيل السكربت
+const ANIME_2_LOOP_TIME = 15 * 60 * 1000; // ثم يعيد كل 30 دقيقة
+
+// ==========================================
+
+const axios = require('axios');
+const express = require('express');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => res.send('✅ البوت الإسلامي يعمل بنصوص نقية وتوقيت دقيق!'));
+app.listen(PORT, () => console.log(🌐 الخادم يعمل على المنفذ ${PORT}`));
+
+const MAIN_BASE_URL = 'https://anslayer.com/anime/public/anime-comments/';
 const CLIENT_ID = 'android-app2';
 const CLIENT_SECRET = '7befba6263cc14c90d2f1d6da2c5cf9b251bfbbd';
-const TARGET_ANIME_ID = 2025;
+const TOKEN = 'af59f86ee8527098f880800c244655e9e3788a7c';
 
-// التوكنات المحددة فقط
-const TOKENS = [
-    '5a4610c296d25043f48b4ac9f4b652541929199f',
-    'ba3e81f3108294c289af82ac6e7138632290344e',
-    'bbeeba74c11b1eede2d2e33d855e8dc3779782dd',
-    'ab03d7f20c753a0375a7d52647f60fb9b475eaa4'
+// المصفوفات والمتغيرات
+let apiTexts = [];
+let fallbackTexts = [];
+let apiIndex = 0;
+let fallbackIndex = 0;
+let useOnlyFallback = false;
+let messageCounter = 0; // حاسبة لمعرفة متى نستخدم القائمة البديلة
+
+// دالة لخلط المصفوفات
+function shuffleArray(array) {
+for (let i = array.length - 1; i > 0; i--) {
+const j = Math.floor(Math.random() * (i + 1));
+[array[i], array[j]] = [array[j], array[i]];
+}
+}
+
+// القائمة البديلة الطويلة
+const fallbackLibrary = [
+// --- الآيات القرآنية ---
+"{ فَاذْكُرُونِي أَذْكُرْكُمْ } [البقرة: 152]",
+"{ وَرَحْمَتِي وَسِعَتْ كُلَّ شَيْءٍ } [الأعراف: 156]",
+"{ إِنَّ مَعَ الْعُسْرِ يُسْرًا } [الشرح: 6]",
+"{ وَإِذَا سَأَلَكَ عِبَادِي عَنِّي فَإِنِّي قَرِيبٌ } [البقرة: 186]",
+"{ أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ } [الرعد: 28]",
+"{ وَمَا كَانَ اللَّهُ مُعَذِّبَهُمْ وَهُمْ يَسْتَغْفِرُونَ } [الأنفال: 33]",
+"{ وَالَّذِينَ يَرْمُونَ الْمُحْصَنَاتِ ثُمَّ لَمْ يَأْتُوا بِأَرْبَعَةِ شُهَدَاءَ فَاجْلِدُوهُمْ ثَمَانِينَ جَلْدَةً } [النور: 4]",
+"{ إِنَّ اللَّهَ وَمَلَائِكَتَهُ يُصَلُّونَ عَلَى النَّبِيِّ ۚ يَا أَيُّهَا الَّذِينَ آمَنُوا صَلُّوا عَلَيْهِ وَسَلِّمُوا تَسْلِيمًا } [الأحزاب: 56]",
+"{ لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا } [البقرة: 286]",
+"{ وَقُل رَّبِّ زِدْنِي عِلْمًا } [طه: 114]",
+"{ وَمَن يَتَّقِ اللَّهَ يَجْعَل لَّهُ مَخْرَجًا * وَيَرْزُقْهُ مِنْ حَيْثُ لَا يَحْتَسِبُ } [الطلاق: 2-3]",
+"{ قُلْ يَا عِبَادِيَ الَّذِينَ أَسْرَفُوا عَلَىٰ أَنفُسِهِمْ لَا تَقْنَطُوا مِن رَّحْمَةِ اللَّهِ } [الزمر: 53]",
+"{ وَهُوَ مَعَكُمْ أَيْنَ مَا كُنتُمْ } [الحديد: 4]",
+"{ ادْعُونِي أَسْتَجِبْ لَكُمْ } [غافر: 60]",
+"{ وَاصْبِرْ وَمَا صَبْرُكَ إِلَّا بِاللَّهِ } [النحل: 127]",
+"{ وَقَضَىٰ رَبُّكَ أَلَّا تَعْبُدُوا إِلَّا إِيَّاهُ وَبِالْوَالِدَيْنِ إِحْسَانًا } [الإسراء: 23]",
+"{ وَتَوَكَّلْ عَلَى الْحَيِّ الَّذِي لَا يَمُوتُ } [الفرقان: 58]",
+"{ سَيَجْعَلُ اللَّهُ بَعْدَ عُسْرٍ يُسْرًا } [الطلاق: 7]",
+"{ رَبَّنَا لَا تُزِغْ قُلُوبَنَا بَعْدَ إِذْ هَدَيْتَنَا وَهَبْ لَنَا مِن لَّدُنكَ رَحْمَةً } [آل عمران: 8]",
+"{ فَقُلْتُ اسْتَغْفِرُوا رَبَّكُمْ إِنَّهُ كَانَ غَفَّارًا } [نوح: 10]",
+"{ وَالْبَاقِيَاتُ الصَّالِحَاتُ خَيْرٌ عِندَ رَبِّكَ ثَوَابًا وَخَيْرٌ أَمَلًا } [الكهف: 46]",
+"{ إِيَّاكَ نَعْبُدُ وَإِيَّاكَ نَسْتَعِينُ } [الفاتحة: 5]",
+"{ وَاللَّهُ غَالِبٌ عَلَى أَمْرِهِ وَلَكِنَّ أَكْثَرَ النَّاسِ لا يَعْلَمُونَ } [يوسف: 21]",
+"{ رَبَّنَا آتِنَا فِي الدُّنْيَا حَسَنَةً وَفِي الْآخِرَةِ حَسَنَةً وَقِنَا عَذَابَ النَّارِ } [البقرة: 201]",
+"{ وَمَا تَوْفِيقِي إِلَّا بِاللَّهِ ۚ عَلَيْهِ تَوَكَّلْتُ وَإِلَيْهِ أُنِيبُ } [هود: 88]",
+"{ وَنَحْنُ أَقْرَبُ إِلَيْهِ مِنْ حَبْلِ الْوَرِيدِ } [ق: 16]",
+"{ إِن يَنصُرْكُمُ اللَّهُ فَلَا غَالِبَ لَكُمْ } [آل عمران: 160]",
+"{ رَبِّ إِنِّي لِمَا أَنزَلْتَ إِلَيَّ مِنْ خَيْرٍ فَقِيرٌ } [القصص: 24]",
+"{ لَئِن شَكَرْتُمْ لَأَزِيدَنَّكُمْ } [إبراهيم: 7]",
+"{ النور: 23: ﴿إِنَّ الَّذِينَ يَرْمُونَ الْمُحْصَنَاتِ الْغَافِلَاتِ الْمُؤْمِنَاتِ لُعِنُوا فِي الدُّنْيَا وَالْآخِرَةِ وَلَهُمْ عَذَابٌ عَظِيمٌ]",
+"{ وَعَسَىٰ أَن تَكْرَهُوا شَيْئًا وَهُوَ خَيْرٌ لَّكُمْ } [البقرة: 216]",
+
+// --- الأحاديث النبوية المشهورة ---
+"قال رسول الله ﷺ: خيركم من تعلم القرآن وعلمه.",
+"قال رسول الله ﷺ: إنما الأعمال بالنيات، وإنما لكل امرئ ما نوى.",
+"قال رسول الله ﷺ: من سلك طريقًا يلتمس فيه علمًا، سهل الله له به طريقًا إلى الجنة.",
+"قال رسول الله ﷺ: اتق الله حيثما كنت، وأتبع السيئة الحسنة تمحها، وخالق الناس بخلق حسن.",
+"قال رسول الله ﷺ: الكلمة الطيبة صدقة.",
+"قال رسول الله ﷺ: لا يؤمن أحدكم حتى يحب لأخيه ما يحب لنفسه.",
+"قال رسول الله ﷺ: المرء مع من أحب.",
+"قال رسول الله ﷺ: المسلم من سلم المسلمون من لسانه ويده.",
+"قال رسول الله ﷺ: من حسن إسلام المرء تركه ما لا يعنيه.",
+"قال رسول الله ﷺ: تبسمك في وجه أخيك لك صدقة.",
+"قال رسول الله ﷺ: لا تحقرن من المعروف شيئًا، ولو أن تلقى أخاك بوجه طلق.",
+"قال رسول الله ﷺ: الطهور شطر الإيمان.",
+"قال رسول الله ﷺ: من صمت نجا.",
+"قال رسول الله ﷺ: أحب الأعمال إلى الله أدومها وإن قل.",
+"قال رسول الله ﷺ: احفظ الله يحفظك، احفظ الله تجده تجاهك.",
+"قال رسول الله ﷺ: كلمتان خفيفتان على اللسان ثقيلتان في الميزان حبيبتان إلى الرحمن: سبحان الله وبحمده، سبحان الله العظيم.",
+"قال رسول الله ﷺ: الدال على الخير كفاعله.",
+" قال رسول الله ﷺ: ما نقص مال من صدقة.",
+"قال رسول الله ﷺ: من يرد الله به خيرا يفقهه في الدين.",
+"قال رسول الله ﷺ: اتقوا النار ولو بشق تمرة.",
+"قال رسول الله ﷺ: ركعتا الفجر خير من الدنيا وما فيها.",
+"قال رسول الله ﷺ: إن الله يحب إذا عمل أحدكم عملا أن يتقنه.",
+
+// --- الأذكار والأدعية ---
+"سبحان الله وبحمده، سبحان الله العظيم.",
+"استغفر الله العظيم الذي لا إله إلا هو الحي القيوم وأتوب إليه.",
+"لا حول ولا قوة إلا بالله العلي العظيم.",
+"اللهم صل وسلم وبارك على نبينا محمد وعلى آله وصحبه أجمعين.",
+"لا إله إلا الله وحده لا شريك له، له الملك وله الحمد وهو على كل شيء قدير.",
+"يا مقلب القلوب ثبت قلبي على دينك.",
+"اللهم إنك عفو تحب العفو فاعف عنا.",
+"حسبي الله لا إله إلا هو، عليه توكلت وهو رب العرش العظيم.",
+"اللهم إني أسألك الجنة وأعوذ بك من النار.",
+"اللهم آتنا في الدنيا حسنة وفي الآخرة حسنة وقنا عذاب النار.",
+"رضيت بالله ربا، وبالإسلام دينا، وبمحمد ﷺ نبيا.",
+"سبحان الله، والحمد لله، ولا إله إلا الله، والله أكبر.",
+"اللهم أعني على ذكرك وشكرك وحسن عبادتك.",
+"لا إله إلا أنت سبحانك إني كنت من الظالمين.",
+"اللهم اغفر لي ذنبي كله، دقه وجله، وأوله وآخره، وعلانيته وسره.",
+"اللهم إني أسألك العفو والعافية في الدنيا والآخرة.",
+"اللهم اكفني بحلالك عن حرامك، وأغنني بفضلك عمن سواك.",
+"الحمد لله الذي أطعمنا وسقانا وجعلنا مسلمين.",
+"اللهم قني عذابك يوم تبعث عبادك.",
+"بسم الله الذي لا يضر مع اسمه شيء في الأرض ولا في السماء وهو السميع العليم.",
+"اللهم عالم الغيب والشهادة، فاطر السماوات والأرض، رب كل شيء ومليكه.",
+"أعوذ بكلمات الله التامات من شر ما خلق.",
+"اللهم إني أعوذ بك من الهم والحزن، والعجز والكسل، والبخل والجبن.",
+"اللهم اغفر للمسلمين والمسلمات والمؤمنين والمؤمنات الأحياء منهم والأموات.",
+"يا حي يا قيوم برحمتك أستغيث، أصلح لي شأني كله ولا تكلني إلى نفسي طرفة عين.",
+"اللهم مصرف القلوب صرف قلوبنا على طاعتك.",
+"رب اغفر لي وتب علي إنك أنت التواب الرحيم.",
+"اللهم أجرني من النار.",
+"اللهم إني أسألك الهدى والتقى والعفاف والغنى.",
+"اللهم إني أعوذ بك من زوال نعمتك، وتحول عافيتك، وفجاءة نقمتك، وجميع سخطك.",
+"لا إله إلا الله العظيم الحليم، لا إله إلا الله رب العرش العظيم.",
+"اللهم أصلح لي ديني الذي هو عصمة أمري، وأصلح لي دنياي التي فيها معاشي.",
+"اللهم اغفر لي خطيئتي وجهلي وإسرافي في أمري.",
+"اللهم إني أسألك علما نافعا ورزقا طيبا وعملا متقبلا.",
+"الحمد لله حمدا كثيرا طيبا مباركا فيه."
 ];
+// ==========================================
+// 📚 جلب الأذكار وتنظيفها
+// ==========================================
+async function loadMassiveLibrary() {
+console.log('🔄 جارٍ جلب وتنظيف الأذكار من المصدر...');
+const uniqueTexts = new Set();
 
-// إعداد HTTPS Agent
-const agent = new https.Agent({ keepAlive: true, maxSockets: 60, keepAliveMsecs: 30000 });
-const http = axios.create({ httpsAgent: agent, timeout: 10000 });
+// تجهيز القائمة البديلة
+fallbackTexts = [...fallbackLibrary];
+shuffleArray(fallbackTexts);
 
-// تخزين معرفات الردود المعالجة
-const processedReplies = new Set();
+try {
+const res = await axios.get('https://raw.githubusercontent.com/nawafalqari/azkar-api/56df51279ab6eb86dc2f6202c7de26c8948331c1/azkar.json');
 
-// دالة إرسال ديسلايك لحساب واحد
-async function sendDislike(token, replyId) {
-    const params = new URLSearchParams();
-    params.append('anime_comment_reply_id', String(replyId));
+for (const category in res.data) {
+res.data[category].forEach(item => {
+if (item.content) {
+let cleanText = typeof item.content === 'string' ? item.content : String(item.content);
+cleanText = cleanText.replace(/\n|\n/g, ' ');
+cleanText = cleanText.replace(/['",]/g, '');
+cleanText = cleanText.replace(/\s+/g, ' ').trim();
 
-    try {
-        await http.post(`${BASE}anime-comment-reply-dislike`, params.toString(), {
-            headers: {
-                'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 11; Build/RP1A.200720.011)',
-                'Content-Type': 'application/x-www-form-urlencoded',
-                'Client-Id': CLIENT_ID,
-                'Client-Secret': CLIENT_SECRET,
-                'X-Requested-With': 'com.anslayer.app',
-                'Authorization': `Bearer ${token}`
-            }
-        });
-        return true;
-    } catch (err) {
-        return false;
-    }
+if (cleanText.length > 10 && cleanText.length < 250) {
+uniqueTexts.add(cleanText);
+}
+}
+});
+}
+apiTexts = Array.from(uniqueTexts);
+shuffleArray(apiTexts);
+console.log(✅ تم جلب [${apiTexts.length} ] ذكر من الرابط.`);
+} catch (e) {
+console.log('⚠️ فشل السحب من الرابط، سيتم الاعتماد كلياً على القائمة البديلة.');
+useOnlyFallback = true;
+}
 }
 
-// دالة الهجوم على رد واحد (كل التوكنات بالتوازي)
-async function attackReply(replyId, authorName, replyText) {
-    console.log(`⚔️ هجوم ديسلايك على رد ${replyId} من ${authorName}`);
-    const results = await Promise.all(
-        TOKENS.map(async (token, i) => {
-            const success = await sendDislike(token, replyId);
-            console.log(`  [${i+1}] ${success ? '✅ تم' : '❌ فشل'}`);
-            return success;
-        })
-    );
-    const count = results.filter(Boolean).length;
-    console.log(`✅ اكتمل الهجوم: ${count}/${TOKENS.length} نجحوا\n`);
+// ==========================================
+// ⚖️ نظام اختيار النص (5 من الرابط، 1 من البديلة)
+// ==========================================
+function getNextIslamicText() {
+// إذا فشل الرابط تماماً، نأخذ من القائمة البديلة فقط
+if (useOnlyFallback || apiTexts.length === 0) {
+if (fallbackIndex >= fallbackTexts.length) {
+shuffleArray(fallbackTexts);
+fallbackIndex = 0;
+}
+return fallbackTexts[fallbackIndex++];
 }
 
-// دالة جلب أحدث تعليقين
-async function fetchLatestComments(limit = 2) {
-    const params = { anime_id: TARGET_ANIME_ID, _offset: 0, _limit: limit };
-    const url = `${BASE}get-anime-comments?json=${encodeURIComponent(JSON.stringify(params))}`;
-    try {
-        const res = await http.get(url, {
-            headers: {
-                'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 11; Build/RP1A.200720.011)',
-                'Client-Id': CLIENT_ID,
-                'Client-Secret': CLIENT_SECRET,
-                'X-Requested-With': 'com.anslayer.app'
-            }
-        });
-        return res.data?.response?.data || res.data?.data || [];
-    } catch (err) {
-        return [];
-    }
+messageCounter++;
+
+// كل 6 رسائل، أرسل الرسالة السادسة من القائمة البديلة (بمعنى 5 من الرابط و 1 بديلة)
+if (messageCounter % 2 === 0) {
+if (fallbackIndex >= fallbackTexts.length) {
+shuffleArray(fallbackTexts);
+fallbackIndex = 0;
+}
+return fallbackTexts[fallbackIndex++];
+} else {
+// خلاف ذلك أرسل من الرابط
+if (apiIndex >= apiTexts.length) {
+shuffleArray(apiTexts);
+apiIndex = 0;
+}
+return apiTexts[apiIndex++];
+}
 }
 
-// دالة جلب جميع ردود تعليق معين (حتى 100 رد، يمكن زيادتها)
-async function fetchReplies(commentId) {
-    const params = { anime_comment_id: commentId, _offset: 0, _limit: 100 };
-    const url = `${BASE}get-anime-comment-replies?json=${encodeURIComponent(JSON.stringify(params))}`;
-    try {
-        const res = await http.get(url, {
-            headers: {
-                'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 11; Build/RP1A.200720.011)',
-                'Client-Id': CLIENT_ID,
-                'Client-Secret': CLIENT_SECRET,
-                'X-Requested-With': 'com.anslayer.app'
-            }
-        });
-        return res.data?.response?.data || res.data?.data || [];
-    } catch (err) {
-        return [];
-    }
+// ==========================================
+// 🚀 دالة إرسال التعليق
+// ==========================================
+async function testCommentsFlow(animeId) {
+let firstCommentId = null;
+
+try {
+const jsonQuery = encodeURIComponent(JSON.stringify({ anime_id: animeId, page: 1 }));
+const commentsRes = await axios.get(${MAIN_BASE_URL}get-anime-comments?json=${jsonQuery}, {
+headers: {
+'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 11; Build/RP1A.200720.011)',
+'Client-Id': CLIENT_ID,
+'Client-Secret': CLIENT_SECRET,
+'X-Requested-With': 'com.anslayer.app'
+}
+});
+
+const resBody = commentsRes.data?.response;
+let commentsList = [];
+if (Array.isArray(resBody)) commentsList = resBody;
+else if (resBody && Array.isArray(resBody.data)) commentsList = resBody.data;
+
+if (commentsList.length > 0) {
+const sample = commentsList[0];
+firstCommentId = sample.anime_comment_id || sample.comment_id || sample.id;
+}
+} catch (error) {
+return;
 }
 
-// دورة الفحص والهجوم
-async function scanAndAttack() {
-    console.log('🔄 فحص أحدث تعليقين...');
-    const comments = await fetchLatestComments(2);
+if (!firstCommentId) return;
 
-    if (comments.length === 0) {
-        console.log('⚠️ لا توجد تعليقات.');
-        return;
-    }
+const replyText = getNextIslamicText();
+console.log(\n📬 [أنمي ${animeId}]: جارٍ إرسال رد...`);
 
-    console.log(`📋 عدد التعليقات: ${comments.length}`);
+try {
+await axios.post(``${MAIN_BASE_URL}create-anime-comment-reply, { anime_comment_id: firstCommentId, reply_text: replyText, spoiler: "No" }, { headers: { 'User-Agent': 'Dalvik/2.1.0 (Linux; U; Android 11; Build/RP1A.200720.011)', 'Content-Type': 'application/json', 'Client-Id': CLIENT_ID, 'Client-Secret': CLIENT_SECRET, 'X-Requested-With': 'com.anslayer.app', 'Authorization':Bearer latex
+{TOKEN}` } }); console.log(`✅ [أنمي 
 
-    for (const comment of comments) {
-        const commentId = comment.anime_comment_id;
-        console.log(`🔍 جلب ردود التعليق ${commentId}...`);
-        const replies = await fetchReplies(commentId);
-        console.log(`💬 عدد الردود: ${replies.length}`);
+{animeId}] تم نشر: latex
+{replyText.substring(0, 35)}...`); } catch (error) { console.log(`❌ فشل إرسال الرد الحالي للأنمي 
 
-        for (const reply of replies) {
-            const replyId = reply.anime_comment_reply_id;
-            if (processedReplies.has(replyId)) continue;
-
-            processedReplies.add(replyId);
-            const author = reply.user_full_name || 'مجهول';
-            const text = reply.reply_text || '';
-            await attackReply(replyId, author, text);
-
-            // تنظيف المجموعة إذا كبرت
-            if (processedReplies.size > 1000) {
-                processedReplies.clear();
-                console.log('🧹 تم تفريغ الذاكرة.');
-            }
-        }
-    }
+{animeId}.`);
+}
 }
 
-// تشغيل مستمر
-async function main() {
-    console.log('🚀 بدأ رادار الديسلايك الشامل (أحدث تعليقين، كل ردودهم)');
-    console.log(`📌 عدد الحسابات: ${TOKENS.length}`);
-    console.log(`📌 الهدف: أنمي ${TARGET_ANIME_ID}\n`);
+// ⏰ دالة منع النوم
+const RENDER_APP_URL = 'https://script-gg76.onrender.com';
 
-    while (true) {
-        await scanAndAttack();
-        // انتظر 10 ثوانٍ قبل الدورة التالية
-        await new Promise(resolve => setTimeout(resolve, 10000));
-    }
+setInterval(async () => {
+try {
+await axios.get(RENDER_APP_URL);
+} catch (error) {
+// تجاهل بصمت
 }
+}, 600000);
 
-main().catch(err => {
-    console.error('خطأ فادح:', err.message);
-    process.exit(1);
+// ==========================================
+// 🚀 التشغيل المبرمج والذكي
+// ==========================================
+loadMassiveLibrary().then(() => {
+
+console.log("▶️ بدء تشغيل السكربتات...");
+
+// 1️⃣ تشغيل أنمي 2025 (أبو 3 دقائق) فوراً، ثم تكراره
+testCommentsFlow(ANIME_1_ID);
+setInterval(() => {
+testCommentsFlow(ANIME_1_ID);
+}, ANIME_1_LOOP_TIME);
+
+// 2️⃣ تشغيل أنمي 2021 (أبو 30 دقيقة) بعد انتظار الدقيقة الأولى، ثم تكراره
+setTimeout(() => {
+testCommentsFlow(ANIME_2_ID); // يشتغل أول مرة هنا!
+setInterval(() => {
+testCommentsFlow(ANIME_2_ID);
+}, ANIME_2_LOOP_TIME); // ثم يبدأ بتكرار نفسه كل 30 دقيقة
+}, ANIME_2_FIRST_DELAY);
+
 });
